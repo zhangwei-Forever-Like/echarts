@@ -288,7 +288,7 @@
           borderWidth: 1
         },
         emphasis: {
-          areaColor: "#2B91B7"
+          areaColor: "#2B91B7"  
         }
       }
     },

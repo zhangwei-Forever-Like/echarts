@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    h1 {
+      background-color: #ffffff;
+      border-radius: 5px;
+      text-align: center;
+    }
+
+    #container {
+      background-color: #f1f2f6;
+      padding-bottom: 20vh;
+    }
+
+    #row1, #row2, #row3 {
+      margin-left: 20px;
+      margin-right: 20px;
+      background-color: #ffffff;
+      border-radius: 10px;
+    }
+
+    #row2, #row3 {
+      margin-top: 10px;
+
+    }
+
+    #row1_item1, #row1_item2 {
+      padding: 20px;
+    }
+
+    /*#row1_item1{*/
+    /*  background-color: #5daf34;*/
+    /*}*/
+    #content {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .content_item {
+      display: block;
+      width: 110px;
+      height: 110px;
+      background: #3a8ee6;
+      border-radius: 5px;
+      margin: 2px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .content_item > p {
+      text-align: center;
+    }
+
+    .p_content {
+      font-size: 15px;
+    }
+
+    .p_num {
+      font-size: 25px;
+      color: #4e8be6;
+      font-weight: bold;
+    }
+
+    #myEcharts {
+      width: 80%;
+      min-width: 500px;
+      height: 500px;
+      border: solid 1px #B9BEC9;
+      margin: 0 auto;
+    }
+
+    #app {
+      margin: auto;
+    }
+
+    #addEcharts {
+      width: 90%;
+      min-width: 400px;
+      height: 80%;
+      min-height: 500px;
+    }
+
+    #charts {
+      margin: auto;
+
+    }
+  </style>
+  <script src="./echart/js/echarts.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="./echart/js/china.js" type="text/javascript" charset="utf-8"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
+  <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div class="container-fluid" id="container">
+  <h1 style="padding:5px 10px">中国地区疫情数据平台</h1>
+  <div class="row" id="row1">
+    <!--    文字展示以及图表展示-->
+    <div id="row1_item1" class="col-sm-4">
+      <div class="col">
+        <!--    文字展示-->
+        <div id="content" class="col-sm-12">
+          <div class="content_item" style="background: #fffaf7">
+            <p class="p_num" id="localConfirm">12334</p>
+            <p class="p_content">现有确诊</p>
+          </div>
+          <div class="content_item" style="background: #fff4f4">
+            <p class="p_num" id="confirm">12334</p>
+            <p class="p_content">累计确诊</p>
+          </div>
+          <div class="content_item" style="background: #f1f5ff">
+            <p class="p_num" id="heal">12334</p>
+            <p class="p_content">治愈人数</p>
+          </div>
+
+          <div class="content_item" style="background: #f3f6f8">
+            <p class="p_num" id="noInfect">12334</p>
+            <p class="p_content">无症状感染</p>
+          </div>
+          <div class="content_item" style="background: #fff8f8">
+            <p class="p_num" id="nowServer">12334</p>
+            <p class="p_content">重症患者</p>
+          </div>
+          <div class="content_item" style="background: #ecf0f1">
+            <p class="p_num" id="dead">12334</p>
+            <p class="p_content">累计死亡</p>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+    <!--    地图展示-->
+    <div id="row1_item2" class="col-sm-8">
+      <div id="myEcharts"></div>
+    </div>
+  </div>
+  <div class="row" id="row2">
+    <!--    图表展示-->
+    <div id="charts" class="col-sm-12" style="margin-top:20px">
+      <div id="addEcharts"></div>
+    </div>
+  </div>
+  <!--  各省内容-->
+  <div class="row" id="row3">
+    <div id="app">
+      <el-table
+        :data="tableData"
+        style="width: 100%"
+        :default-sort="{prop: 'date', order: 'descending'}"
+      >
+        <el-table-column
+          prop="name"
+          label="地区"
+          width="220">
+        </el-table-column>
+        <el-table-column
+          prop="nowConfirm"
+          label="现有确诊"
+          sortable
+          width="220">
+        </el-table-column>
+        <el-table-column
+          prop="suspect"
+          sortable
+          label="疑似病例"
+          width="220"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="dead"
+          sortable
+          width="220"
+          label="死亡人数">
+        </el-table-column>
+        <el-table-column
+          prop="heal"
+          sortable
+          width="220"
+          label="累计治愈">
+        </el-table-column>
+      </el-table>
+    </div>
+  </div>
+</div>
+<!--为echarts准备一个dom容器-->
+
+<script>
+  initMap();
+  initLine();
+
+  function initMap() {
+    //初始化echarts实例
+    var myChart = echarts.init(document.getElementById('myEcharts'));
+    // 指定图表的配置项和数据
+    option = {
+      title: {
+        text: '中国新冠疫情实时数据地图',
+        left: 'center'
+      },
+      tooltip: {
+        trigger: 'item'
+      },
+      legend: {
+        orient: 'vertical',
+        left: 'left',
+        data: ['中国新冠疫情实时数据地图']
+      },
+      visualMap: {
+        type: 'piecewise',
+        pieces: [
+          {min: 10000, max: 1000000, label: '确诊大于等于10000人', color: '#372a28'},
+          {min: 5000, max: 9999, label: '确诊5000-9999人', color: '#4e160f'},
+          {min: 1000, max: 4999, label: '确诊1000-4999人', color: '#974236'},
+          {min: 100, max: 999, label: '确诊100-999人', color: '#ee7263'},
+          {min: 1, max: 99, label: '确诊1-99人', color: '#f5bba7'},
+        ],
+        color: ['#E0022B', '#E09107', '#A3E00B']
+      },
+      toolbox: {
+        show: true,
+        orient: 'vertical',
+        left: 'right',
+        top: 'center',
+        feature: {
+          mark: {show: true},
+          dataView: {show: true, readOnly: false},
+          restore: {show: true},
+          saveAsImage: {show: true}
+        }
+      },
+      roamController: {
+        show: true,
+        left: 'right',
+        mapTypeControl: {
+          'china': true
+        }
+      },
+      series: [
+        {
+          name: '确诊数',
+          type: 'map',
+          mapType: 'china',
+          roam: false,
+          label: {
+            show: true,
+            color: 'rgb(249, 249, 249)'
+          },
+          data: [//实时数据放在这里，格式如下...
+            // {
+            //   name: '北京',
+            //   value: 212
+            // }, {
+            //   name: '天津',
+            //   value: 60
+            // },
+          ]
+        }
+      ]
+    };
+    // myChart.setOption(option); //使用指定的配置项和数据显示图表
+    //调用腾讯疫情实时数据接口。因为该接口跟我们的数据格式不同，所以需要先做格式转换再显示...
+    $.ajax({
+      url: "https://view.inews.qq.com/g2/getOnsInfo?name=disease_h5",
+      dataType: "jsonp", //jsonp做跨域访问
+      success: function (res) {
+        var dataList = JSON.parse(res.data).chinaTotal;
+        // alert(  dataList.localConfirm+' '+dataList.confirm+' '+dataList.heal+' '+dataList.noInfect
+        //   +' '+dataList.nowSevere+ ' '+dataList.dead);
+        $("#localConfirm").text(dataList.localConfirm);
+        $("#confirm").text(dataList.confirm);
+        $("#heal").text(dataList.heal);
+        $("#noInfect").text(dataList.noInfect);
+        $("#nowServer").text(dataList.nowSevere);
+        $("#dead").text(dataList.dead);
+
+        let dataBefore = JSON.parse(res.data).areaTree[0];
+        let nowConfirm = dataBefore.children.map(province => ({//接受到的数据进行数据格式转换...
+          name: province.name,
+          value: province.total.confirm,
+        }))
+
+        option.series[0].data = nowConfirm;
+        myChart.setOption(option); //使用指定的配置项和数据显示图表
+        //
+        // // 现有确诊
+        // console.log('现有确诊'+JSON.stringify(nowConfirm));
+        // console.log('疑似'+JSON.stringify(suspect));
+        // console.log('死亡'+JSON.stringify(dead));
+        // console.log('治愈'+JSON.stringify(heal));
+
+      }
+    })
+  }
+
+  function initLine() {
+    var addChart = echarts.init(document.getElementById('addEcharts'));
+    var option = {
+      title: {
+        text: '中国疫情概览图（近十日）'
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'cross',
+          label: {
+            backgroundColor: '#6a7985'
+          }
+        }
+      },
+      // 图标内容
+      legend: {
+        data: ['累计确诊', '累计治愈', '累计死亡', '现有确诊','新增确诊']
+      },
+      toolbox: {
+        feature: {
+          saveAsImage: {}
+        }
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+      },
+      xAxis: [
+        {
+          type: 'category',
+          boundaryGap: false,
+        }
+      ],
+      yAxis: [
+        {
+          type: 'value'
+        }
+      ],
+      series: [
+        {
+          name: '累计确诊',
+          type: 'line',
+          stack: '总量',
+          areaStyle: {
+            color: '#d63031'
+
+          },
+          emphasis: {
+            focus: 'series'
+          },
+          data: [120, 132, 101, 90, 230]
+        },
+        {
+          name: '累计治愈',
+          type: 'line',
+          stack: '总量',
+          areaStyle: {
+            color: '#0984e3'
+          },
+          emphasis: {
+            focus: 'series'
+          },
+          data: [220, 182, 191, 234, 290]
+        },
+        {
+          name: '累计死亡',
+          type: 'line',
+          stack: '总量',
+          areaStyle: {
+            color: '#636e72'
+          },
+          emphasis: {
+            focus: 'series'
+          },
+          data: [150, 154, 190, 330, 410]
+        },
+        {
+          name: '现有确诊',
+          type: 'line',
+          stack: '总量',
+          areaStyle: {
+            color: '#e17055'
+          },
+          emphasis: {
+            focus: 'series'
+          },
+          data: [320, 334, 390, 330, 320]
+        },
+        {
+          name: '新增确诊',
+          type: 'line',
+          stack: '总量',
+          areaStyle: {
+            color: '#fab1a0'
+          },
+          emphasis: {
+            focus: 'series'
+          },
+          data: [321, 314, 90, 130, 320]
+        },
+      ]
+    };
+    addChart.setOption(option);
+    //获取除新增人数外的所有数据
+    $.get("https://api.inews.qq.com/newsqa/v1/query/inner/publish/modules/list?modules=chinaDayList", function (data, status) {
+      // alert(JSON.stringify(data))
+      var dataList = data.data.chinaDayList;
+      console.log(dataList);
+      var xData = new Array(),
+        confirmData = new Array(),
+        healData = new Array(),
+        deadData = new Array(),
+        nowConfirmData = new Array();
+      for (var i = dataList.length - 10; i < dataList.length; i++) {
+        xData.push(dataList[i].date);
+        confirmData.push(dataList[i].confirm);//累计确诊
+        healData.push(dataList[i].heal);
+        deadData.push(dataList[i].dead);//累计死亡
+        nowConfirmData.push(dataList[i].nowConfirm);//现有确诊
+      }
+      option.xAxis[0].data = xData;
+      option.series[0].data = confirmData;
+      option.series[1].data = healData;
+      option.series[2].data = deadData;
+      option.series[3].data = nowConfirmData;
+      console.log(option)
+      addChart.setOption(option);
+    });
+    //新增人数
+    $.get("https://api.inews.qq.com/newsqa/v1/query/inner/publish/modules/list?modules=chinaDayAddList", function (data, status) {
+      // alert(JSON.stringify(data))
+      var dataList = data.data.chinaDayAddList;
+      console.log(dataList);
+      var localConfirmaddData = new Array();
+      for (var i = dataList.length - 10; i < dataList.length; i++) {
+        localConfirmaddData.push(dataList[i].localConfirmadd);//新增确诊
+      }
+      console.log(localConfirmaddData)
+      option.series[4].data = localConfirmaddData;
+      console.log(option)
+      addChart.setOption(option);
+    });
+  }
+</script>
+</body>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+  var app = new Vue({
+    el: '#app',
+    data() {
+      return {
+        tableData: [{
+          "name": "台湾",
+          "nowConfirm": 13241,
+          "suspect": 0,
+          "dead": 460,
+          "heal": 1133
+        }, {"name": "广东", "nowConfirm": 2635, "suspect": 0, "dead": 8, "heal": 2425}, {
+          "name": "上海",
+          "nowConfirm": 2165,
+          "suspect": 0,
+          "dead": 7,
+          "heal": 2082
+        }]
+      }
+    },
+    methods: {
+      formatter(row, column) {
+        return row.address;
+      }
+    },
+    created() {
+      console.log(this.tableData);
+
+      $.ajax({
+        url: "https://view.inews.qq.com/g2/getOnsInfo?name=disease_h5",
+        dataType: "jsonp", //jsonp做跨域访问
+        success: function (res) {
+
+          let dataBefore = JSON.parse(res.data).areaTree[0];
+          let nowConfirm = dataBefore.children.map(province => ({//接受到的数据进行数据格式转换...
+            name: province.name,
+            value: province.total.confirm,
+          }))
+
+          let suspect = dataBefore.children.map(province => ({//接受到的数据进行数据格式转换...
+            name: province.name,
+            value: province.total.suspect,
+          }))
+          let dead = dataBefore.children.map(province => ({//接受到的数据进行数据格式转换...
+            name: province.name,
+            value: province.total.dead,
+          }))
+          let heal = dataBefore.children.map(province => ({//接受到的数据进行数据格式转换...
+            name: province.name,
+            value: province.total.heal,
+          }))
+          // 现有确诊
+          // console.log('现有确诊' + JSON.stringify(nowConfirm));
+          // console.log('疑似' + JSON.stringify(suspect));
+          // console.log('死亡' + JSON.stringify(dead));
+          // console.log('治愈' + JSON.stringify(heal));
+          // alert(JSON.stringify(heal));
+          // alert(JSON.stringify(heal[1])+' '+JSON.stringify(suspect[1]))
+
+          var list = new Array();
+          for (var i = 0; i < nowConfirm.length; i++) {
+            var item = new Object();
+            item.name = nowConfirm[i].name;
+            item.nowConfirm = nowConfirm[i].value;
+            item.suspect = suspect[i].value;
+            item.dead = dead[i].value;
+            item.heal = heal[i].value;
+            list.push(item);
+          }
+          app.tableData = list;
+        }
+      })
+    }
+
+  })
+</script>
+</html>
+
